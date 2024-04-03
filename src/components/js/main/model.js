@@ -3,7 +3,10 @@ import * as TEXTURE from '@/components/js/texture/index.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 import { createLightning } from './lightningStrike'
+import { LensFlareEffect, LensFlareParams } from '@/lib/LensFlare'
 import * as THREE from 'three'
+import gsap from 'gsap'
+import Style from '../system/style'
 
 let scene = new THREE.Scene()
 const loadingManager = new THREE.LoadingManager(
@@ -68,7 +71,7 @@ function createModels(_scene) {
 
                 // 动画拆分
                 // on
-                const onClip = THREE.AnimationUtils.subclip(animationClip, 'on', 3, 42)
+                const onClip = THREE.AnimationUtils.subclip(animationClip, 'on', 1, 42)
                 console.log(onClip)
                 const onAnimationAction = mixer.clipAction(onClip)
                 onAnimationAction.clampWhenFinished = true;
@@ -98,6 +101,7 @@ function createModels(_scene) {
                         positionalAudio.play()
                         sparklence.userData.isOn = true;
                         scene.userData.lightningStrikeGroup.visible = true
+                        lensTimeline.restart()
                     }
                 }, 'animation').name('on')
                 gui.add({
@@ -109,6 +113,9 @@ function createModels(_scene) {
                         positionalAudio.stop()
                         sparklence.userData.isOn = false;
                         scene.userData.lightningStrikeGroup.visible = false
+                        lensTimeline.pause()
+                        scene.userData.lensFlareEffect.visible = false
+                        scene.getObjectByName("directionalLight").intensity = Style.default.directionalLightIntensity
                     }
                 }, 'animation').name('off')
             }
@@ -135,11 +142,85 @@ function createModels(_scene) {
     f.add(floor.material, 'envMapIntensity').name("Floor EnvMapIntensity")
 
     // 创建闪电
-    const {group, lightningStrikesArray} = createLightning()
+    const { group, lightningStrikesArray } = createLightning()
     scene.add(group)
     group.visible = false
     scene.userData.lightningStrikeGroup = group
     scene.userData.lightningStrikes = lightningStrikesArray
+
+    // 创建光晕
+    const lensFlareEffect = LensFlareEffect(
+        new THREE.Vector3(0, 4.7, 0),
+        1
+    )
+    lensFlareEffect.material.uniforms.colorGain.value = new THREE.Color(77, 145, 255)
+    lensFlareEffect.material.uniforms.starPoints.value = 12
+    lensFlareEffect.material.uniforms.flareShape.value = 0.03
+    lensFlareEffect.material.uniforms.flareSpeed.value = 0.6
+    lensFlareEffect.material.uniforms.ghostScale.value = 0.16
+    lensFlareEffect.visible = false
+    scene.add(lensFlareEffect)
+    scene.userData.lensFlareEffect = lensFlareEffect
+
+    const lensTimeline = gsap.timeline()
+    lensTimeline.pause()
+    lensTimeline.to({},{
+        duration: 2.2,
+        onUpdate:()=>{
+            scene.getObjectByName("directionalLight").intensity = Math.random()*20
+        },
+        onComplete:()=>{
+            scene.getObjectByName("directionalLight").intensity = Style.default.directionalLightIntensity
+        }
+    })
+    lensTimeline.fromTo(
+        lensFlareEffect.material.uniforms.glareSize, {value: 0.65},{
+            value: 0.0,
+            duration: 0.05,
+            yoyo: true,
+            yoyoEase: "none",
+            repeat: 8,
+            onStart: ()=>{
+                scene.userData.lensFlareEffect.visible = true
+                scene.userData.lightningStrikeGroup.visible = false
+            }
+        },
+        ">"
+    )
+    lensTimeline.fromTo(
+        lensFlareEffect.material.uniforms.flareShape, {value: 0.03},{
+            value: 0.0,
+            duration: 0.5,
+        },
+        ">"
+    )
+    lensTimeline.fromTo(
+        lensFlareEffect.material.uniforms.flareSize, { value: 0.0},{
+            value: 0.36,
+            duration: 2,
+            ease: "power1.out",
+            onStart: ()=>{
+                lensFlareEffect.material.uniforms.flareSpeed.value = 0.05
+            }
+        },
+        "<"
+    )
+    // Debug Lens Flare
+    // gui.add(lensFlareEffect.material.uniforms.enabled, 'value').name('Enabled?')
+    // gui.add(lensFlareEffect.material.uniforms.followMouse, 'value').name('Follow Mouse?')
+    // gui.add(lensFlareEffect.material.uniforms.starPoints, 'value').name('starPoints').min(0).max(20).step(1)
+    // gui.add(lensFlareEffect.material.uniforms.glareSize, 'value').name('glareSize').min(0).max(2)
+    // gui.add(lensFlareEffect.material.uniforms.flareSize, 'value').name('flareSize').min(0).max(0.1).step(0.001)
+    // gui.add(lensFlareEffect.material.uniforms.flareSpeed, 'value').name('flareSpeed').min(0).max(1).step(0.01)
+    // gui.add(lensFlareEffect.material.uniforms.flareShape, 'value').name('flareShape').min(0).max(2).step(0.01)
+    // gui.add(lensFlareEffect.material.uniforms.haloScale, 'value').name('haloScale').min(-0.5).max(1).step(0.01)
+    // gui.add(LensFlareParams, 'opacity').name('opacity').min(0).max(1).step(0.01)
+    // gui.add(lensFlareEffect.material.uniforms.ghostScale, 'value').name('ghostScale').min(0).max(2).step(0.01)
+    // gui.add(lensFlareEffect.material.uniforms.animated, 'value').name('animated')
+    // gui.add(lensFlareEffect.material.uniforms.anamorphic, 'value').name('anamorphic')
+    // gui.add(lensFlareEffect.material.uniforms.secondaryGhosts, 'value').name('secondaryGhosts')
+    // gui.add(lensFlareEffect.material.uniforms.starBurst, 'value').name('starBurst')
+    // gui.add(lensFlareEffect.material.uniforms.aditionalStreaks, 'value').name('aditionalStreaks')
 }
 
 /**
