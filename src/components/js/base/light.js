@@ -26,23 +26,23 @@ function createLight(scene) {
     // directionalLight.shadow.camera.bottom = -20
     directionalLight.position.set(0.7, 10, 2.8)
     scene.add(directionalLight)
-    const lightFolder = gui.addFolder('灯光设置')
-    lightFolder.close()
-    lightFolder.add(ambientLight, 'intensity').min(0).max(10).step(0.1).name('环境光强')
-    lightFolder.add(directionalLight, 'intensity').min(0).max(50).step(0.01).name('平行光强')
-    lightFolder.addColor(directionalLight, "color").name('平行光颜色')
-    lightFolder.add(directionalLight.shadow, 'normalBias').min(-1).max(5).step(0.01)
-    lightFolder.add(directionalLight.position, 'x').min(-100).max(200).step(0.1).name('平行光x')
-    lightFolder.add(directionalLight.position, 'y').min(-100).max(200).step(0.1).name('平行光y')
-    lightFolder.add(directionalLight.position, 'z').min(-100).max(200).step(0.1).name('平行光z')
-    const directionalLightHelper = new DirectionalLightHelper(directionalLight)
-    scene.add(directionalLightHelper)
-    const directionalLightCameraHelper = new CameraHelper(directionalLight.shadow.camera)
-    scene.add(directionalLightCameraHelper)
-    directionalLightHelper.visible = false; directionalLightCameraHelper.visible = false
-    lightFolder.add(directionalLightHelper, 'visible').name('平行光辅助器').onChange((e) =>
-        directionalLightCameraHelper.visible = e
-    )
+    // const lightFolder = gui.addFolder('灯光设置')
+    // lightFolder.close()
+    // lightFolder.add(ambientLight, 'intensity').min(0).max(10).step(0.1).name('环境光强')
+    // lightFolder.add(directionalLight, 'intensity').min(0).max(50).step(0.01).name('平行光强')
+    // lightFolder.addColor(directionalLight, "color").name('平行光颜色')
+    // lightFolder.add(directionalLight.shadow, 'normalBias').min(-1).max(5).step(0.01)
+    // lightFolder.add(directionalLight.position, 'x').min(-100).max(200).step(0.1).name('平行光x')
+    // lightFolder.add(directionalLight.position, 'y').min(-100).max(200).step(0.1).name('平行光y')
+    // lightFolder.add(directionalLight.position, 'z').min(-100).max(200).step(0.1).name('平行光z')
+    // const directionalLightHelper = new DirectionalLightHelper(directionalLight)
+    // scene.add(directionalLightHelper)
+    // const directionalLightCameraHelper = new CameraHelper(directionalLight.shadow.camera)
+    // scene.add(directionalLightCameraHelper)
+    // directionalLightHelper.visible = false; directionalLightCameraHelper.visible = false
+    // lightFolder.add(directionalLightHelper, 'visible').name('平行光辅助器').onChange((e) =>
+    //     directionalLightCameraHelper.visible = e
+    // )
 
 }
 

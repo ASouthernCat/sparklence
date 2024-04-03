@@ -3,7 +3,8 @@ import * as TEXTURE from '@/components/js/texture/index.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 import { createLightning } from './lightningStrike'
-import { LensFlareEffect, LensFlareParams } from '@/lib/LensFlare'
+import { LensFlareEffect } from '@/lib/LensFlare'
+import { bloomEffect, outlineEffect } from '../base/composer'
 import * as THREE from 'three'
 import gsap from 'gsap'
 import Style from '../system/style'
@@ -43,16 +44,28 @@ function createModels(_scene) {
     });
 
     // 加载器解析模型
+    gltfLoader.load(import.meta.env.BASE_URL + 'models/eb.glb', // 能量球（法向修复）
+        (glb) => {
+            glb.scene.traverse((child) => {
+                if(child instanceof THREE.Mesh){
+                    child.material.emissive = new THREE.Color(0xffd270)
+                    bloomEffect.selection.add(child)
+                }
+            })
+            scene.add(glb.scene)
+        }
+    )
     gltfLoader.load(import.meta.env.BASE_URL + 'models/sparklence.gltf',
         (gltf) => {
-            const posGuiFolder = gui.addFolder('位置坐标')
-            posGuiFolder.add(gltf.scene.position, 'x')
-            posGuiFolder.add(gltf.scene.position, 'y')
-            posGuiFolder.add(gltf.scene.position, 'z')
+            // const posGuiFolder = gui.addFolder('位置坐标')
+            // posGuiFolder.add(gltf.scene.position, 'x')
+            // posGuiFolder.add(gltf.scene.position, 'y')
+            // posGuiFolder.add(gltf.scene.position, 'z')
             gltf.scene.name = "sparklence"
             const sparklence = gltf.scene
             scene.add(sparklence)
             sparklence.add(positionalAudio)
+            sparklence.getObjectByName("Object_25").visible = false
             updateAllMaterials()
             console.log("", sparklence)
 
@@ -82,16 +95,15 @@ function createModels(_scene) {
                 offAnimationAction.clampWhenFinished = true;
                 offAnimationAction.loop = THREE.LoopOnce
 
-                gui.add({
-                    animation: () => {
-                        mixer.stopAllAction()
-                        animationAction.stop()
-                        animationAction.play()
-                        positionalAudio.play()
-                        sparklence.userData.isOn = false;
-                        scene.userData.lightningStrikeGroup.visible = true
-                    }
-                }, 'animation').name('complete')
+                // gui.add({
+                //     animation: () => {
+                //         mixer.stopAllAction()
+                //         animationAction.stop()
+                //         animationAction.play()
+                //         positionalAudio.play()
+                //         sparklence.userData.isOn = false;
+                //     }
+                // }, 'animation').name('complete')
                 gui.add({
                     animation: () => {
                         if (sparklence.userData.isOn == true) return
@@ -103,7 +115,7 @@ function createModels(_scene) {
                         scene.userData.lightningStrikeGroup.visible = true
                         lensTimeline.restart()
                     }
-                }, 'animation').name('on')
+                }, 'animation').name('成为光！')
                 gui.add({
                     animation: () => {
                         if (sparklence.userData.isOn == false) return
@@ -136,10 +148,6 @@ function createModels(_scene) {
     floor.rotation.x = - Math.PI * 0.5
     floor.name = "ground"
     scene.add(floor)
-    let f = gui.addFolder('地面')
-    f.close()
-    f.addColor(floor.material, 'color').name("floorColor")
-    f.add(floor.material, 'envMapIntensity').name("Floor EnvMapIntensity")
 
     // 创建闪电
     const { group, lightningStrikesArray } = createLightning()
@@ -147,6 +155,11 @@ function createModels(_scene) {
     group.visible = false
     scene.userData.lightningStrikeGroup = group
     scene.userData.lightningStrikes = lightningStrikesArray
+    group.traverse((child)=>{
+        if(child instanceof THREE.Mesh){
+            outlineEffect.selection.add(child)
+        }
+    })
 
     // 创建光晕
     const lensFlareEffect = LensFlareEffect(
@@ -162,10 +175,11 @@ function createModels(_scene) {
     scene.add(lensFlareEffect)
     scene.userData.lensFlareEffect = lensFlareEffect
 
+    // 特效动画
     const lensTimeline = gsap.timeline()
     lensTimeline.pause()
     lensTimeline.to({},{
-        duration: 2.2,
+        duration: 2.4,
         onUpdate:()=>{
             scene.getObjectByName("directionalLight").intensity = Math.random()*20
         },
@@ -196,7 +210,7 @@ function createModels(_scene) {
     )
     lensTimeline.fromTo(
         lensFlareEffect.material.uniforms.flareSize, { value: 0.0},{
-            value: 0.36,
+            value: 0.25,
             duration: 2,
             ease: "power1.out",
             onStart: ()=>{

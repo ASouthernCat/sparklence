@@ -142,7 +142,7 @@ export function createLightning() {
     const lightningStrikeMesh = new THREE.Mesh(
         lightningStrike,
         new THREE.MeshBasicMaterial({
-            color: "#ffffcc",
+            color: "#ffffdd",
         })
     )
 
@@ -150,7 +150,7 @@ export function createLightning() {
     const lightningStrikeMesh2 = new THREE.Mesh(
         lightningStrike2,
         new THREE.MeshBasicMaterial({
-            color: "#ffffcc",
+            color: "#ffffdd",
         })   
     )
 
@@ -158,7 +158,7 @@ export function createLightning() {
     const lightningStrikeMesh3 = new THREE.Mesh(
         lightningStrike3,
         new THREE.MeshBasicMaterial({
-            color: "#ffffcc",
+            color: "#ffffdd",
         })
     )
 
@@ -166,7 +166,7 @@ export function createLightning() {
     const lightningStrikeMesh4 = new THREE.Mesh(
         lightningStrike4,
         new THREE.MeshBasicMaterial({
-            color: "#ffffcc",
+            color: "#ffffdd",
         })
     )
 
@@ -174,7 +174,7 @@ export function createLightning() {
     const lightningStrikeMesh5 = new THREE.Mesh(
         lightningStrike5,
         new THREE.MeshBasicMaterial({
-            color: "#ffffcc",
+            color: "#ffffdd",
         })
     )
     const group = new THREE.Group()

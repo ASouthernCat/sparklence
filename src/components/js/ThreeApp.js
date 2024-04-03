@@ -5,6 +5,7 @@ import { createCamera } from "./base/camera"
 import { createScene } from "./base/scene"
 import { createCube } from "./base/cube"
 import { createRenderer } from "./base/renderer"
+import { createComposer } from "./base/composer"
 import { createControl } from "./base/control"
 import { createLight } from "./base/light"
 import { createModels } from "./main/model"
@@ -27,11 +28,13 @@ class ThreeApp {
         // 场景 scene
         this.scene = createScene()
         this.scene.userData.listener = this.listener
+        // 渲染器 renderer
+        this.renderer = createRenderer(container)
+        // 后处理渲染器 composer
+        this.composer = createComposer(this.renderer, this.scene, this.camera)
         // 场景组成内容 object3D
         createModels(this.scene)
         createLight(this.scene)
-        // 渲染器 renderer
-        this.renderer = createRenderer(container)
         // resize
         resize.resizeEventListener(this.camera, this.renderer)
     }
@@ -63,8 +66,9 @@ class ThreeApp {
                 });
             }
 
-            // // Render
-            this.renderer.render(this.scene, this.camera)
+            // Render
+            // this.renderer.render(this.scene, this.camera)
+            this.composer.render()
 
             // Call tick again on the next frame
             window.requestAnimationFrame(this.tick)
