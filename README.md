@@ -1,6 +1,7 @@
 # SPARKLENCE
-Ultraman Tiga Sparklence --- “神光棒-迪迦”
+Ultraman Tiga Sparklence --- “神光棒-迪迦”  
 
+![输入图片说明](sparklence.png)  
 ## Project Setup
 
 ```sh
