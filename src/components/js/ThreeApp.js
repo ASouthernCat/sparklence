@@ -8,7 +8,7 @@ import { createRenderer } from "./base/renderer"
 import { createControl } from "./base/control"
 import { createLight } from "./base/light"
 import { createModels } from "./main/model"
-
+import { generateRandomVector3OnSphere } from "./utils/randomVector"
 
 var stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -21,7 +21,7 @@ class ThreeApp {
         // 相机 camera
         this.camera = createCamera()
         this.listener = new THREE.AudioListener()
-        this.camera.add( this.listener )
+        this.camera.add(this.listener)
         // 控制器
         this.control = createControl(this.camera, container)
         // 场景 scene
@@ -52,9 +52,15 @@ class ThreeApp {
             // Raycast
             // pickHelper.pick(pickPosition, currentScene.scene, camera)
 
-            if(this.scene.getObjectByName('sparklence') && this.scene.getObjectByName('sparklence').userData.mixer)
-            {
+            if (this.scene.getObjectByName('sparklence') && this.scene.getObjectByName('sparklence').userData.mixer) {
                 this.scene.getObjectByName('sparklence').userData.mixer.update(deltaTime)
+            }
+
+            if (this.scene.userData.lightningStrikes) {
+                this.scene.userData.lightningStrikes.forEach(lightningStrike => {
+                    lightningStrike.rayParameters.destOffset.addScalar(Math.sin(elapsedTime) * 0.05)
+                    lightningStrike.update(elapsedTime)
+                });
             }
 
             // // Render

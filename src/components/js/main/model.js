@@ -2,7 +2,7 @@ import { gui, debugObject } from '@/components/js/system/gui'
 import * as TEXTURE from '@/components/js/texture/index.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
-import { CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer'
+import { createLightning } from './lightningStrike'
 import * as THREE from 'three'
 
 let scene = new THREE.Scene()
@@ -33,7 +33,7 @@ function createModels(_scene) {
     // 音效
     const positionalAudio = new THREE.PositionalAudio(scene.userData.listener);
     const audioLoader = new THREE.AudioLoader();
-    audioLoader.load(import.meta.env.BASE_URL+'audio/TigaSparklence.mp3', function (buffer) {
+    audioLoader.load(import.meta.env.BASE_URL + 'audio/TigaSparklence.mp3', function (buffer) {
         positionalAudio.setBuffer(buffer);
         positionalAudio.setRefDistance(5);
         positionalAudio.offset = 0.5
@@ -68,7 +68,7 @@ function createModels(_scene) {
 
                 // 动画拆分
                 // on
-                const onClip = THREE.AnimationUtils.subclip(animationClip, 'on', 0, 42)
+                const onClip = THREE.AnimationUtils.subclip(animationClip, 'on', 3, 42)
                 console.log(onClip)
                 const onAnimationAction = mixer.clipAction(onClip)
                 onAnimationAction.clampWhenFinished = true;
@@ -86,6 +86,7 @@ function createModels(_scene) {
                         animationAction.play()
                         positionalAudio.play()
                         sparklence.userData.isOn = false;
+                        scene.userData.lightningStrikeGroup.visible = true
                     }
                 }, 'animation').name('complete')
                 gui.add({
@@ -96,6 +97,7 @@ function createModels(_scene) {
                         onAnimationAction.play();
                         positionalAudio.play()
                         sparklence.userData.isOn = true;
+                        scene.userData.lightningStrikeGroup.visible = true
                     }
                 }, 'animation').name('on')
                 gui.add({
@@ -106,6 +108,7 @@ function createModels(_scene) {
                         offAnimationAction.play();
                         positionalAudio.stop()
                         sparklence.userData.isOn = false;
+                        scene.userData.lightningStrikeGroup.visible = false
                     }
                 }, 'animation').name('off')
             }
@@ -131,6 +134,12 @@ function createModels(_scene) {
     f.addColor(floor.material, 'color').name("floorColor")
     f.add(floor.material, 'envMapIntensity').name("Floor EnvMapIntensity")
 
+    // 创建闪电
+    const {group, lightningStrikesArray} = createLightning()
+    scene.add(group)
+    group.visible = false
+    scene.userData.lightningStrikeGroup = group
+    scene.userData.lightningStrikes = lightningStrikesArray
 }
 
 /**
