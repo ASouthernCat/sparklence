@@ -2,8 +2,6 @@ import {
     EffectComposer,
     EffectPass,
     RenderPass,
-    NormalPass,
-    DepthDownsamplingPass,
     SelectiveBloomEffect,
     BlendFunction,
     EdgeDetectionMode,
@@ -13,7 +11,7 @@ import {
     OutlineEffect,
 } from 'postprocessing'
 import { Camera, HalfFloatType, Scene, WebGLRenderer } from 'three'
-import { gui, debugObject } from '@/components/js/system/gui'
+// import { gui, debugObject } from '@/components/js/system/gui'
 
 // 辉光
 let bloomEffect
@@ -68,24 +66,8 @@ function createComposer(renderer, scene, camera) {
         edgeDetectionMode: EdgeDetectionMode.COLOR,
     })
     const smaaPass = new EffectPass(camera, smaaEffect)
-    // normalPass ...
-    const normalPass = new NormalPass(scene, camera)
-    const depthDownsamplingPass = new DepthDownsamplingPass({
-        normalBuffer: normalPass.texture,
-        resolutionScale: 0.5,
-    })
     // 添加渲染通道
     effectComposer.addPass(renderPass)
-    effectComposer.addPass(normalPass)
-    if (capabilities.isWebGL2) {
-
-        effectComposer.addPass(depthDownsamplingPass);
-
-    } else {
-
-        console.log("WebGL 2 not supported, falling back to naive depth downsampling");
-
-    }
     effectComposer.addPass(outlinePass)
     effectComposer.addPass(smaaPass)
     effectComposer.addPass(bloomPass)
