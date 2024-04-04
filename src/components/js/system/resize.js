@@ -1,5 +1,5 @@
 import { sizes } from "./sizes"
-let camera,renderer
+let camera,renderer,composer
 function resizeEvent() {
     // Update sizes
     sizes.width = window.innerWidth
@@ -13,9 +13,11 @@ function resizeEvent() {
     renderer.setSize(sizes.width, sizes.height)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
+    composer.setSize(sizes.width, sizes.height)
+
 }
-export function resizeEventListener(_camera,_renderer){
-    camera = _camera; renderer = _renderer
+export function resizeEventListener(_camera,_renderer,_composer){
+    camera = _camera; renderer = _renderer; composer = _composer;
     window.addEventListener('resize', resizeEvent)
 }
 export function clear(){

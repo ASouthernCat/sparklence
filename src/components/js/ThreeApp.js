@@ -11,8 +11,9 @@ import { createLight } from "./base/light"
 import { createModels } from "./main/model"
 import { generateRandomVector3OnSphere } from "./utils/randomVector"
 
-var stats = new Stats();
+const stats = new Stats();
 stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
+stats.dom.className = "stats"
 // stats.dom.style.top = "20%"
 document.body.appendChild(stats.dom);
 class ThreeApp {
@@ -36,7 +37,7 @@ class ThreeApp {
         createModels(this.scene)
         createLight(this.scene)
         // resize
-        resize.resizeEventListener(this.camera, this.renderer)
+        resize.resizeEventListener(this.camera, this.renderer, this.composer)
     }
     render() {
         // 渲染场景
