@@ -114,6 +114,9 @@ function createModels(_scene) {
                         sparklence.userData.isOn = true;
                         scene.userData.lightningStrikeGroup.visible = true
                         lensTimeline.restart()
+                        if(innerWidth < 730){
+                            gui.close()
+                        }
                     }
                 }, 'animation').name('成为光！')
                 gui.add({
